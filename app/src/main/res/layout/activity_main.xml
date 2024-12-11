@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#28282B"
+    tools:context=".MainActivity">
+
+    <!-- Title -->
+    <TextView
+        android:id="@+id/tvGasConcentrationTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="62dp"
+        android:fontFamily="sans-serif-black"
+        android:text="Concentrações de gases medidos"
+        android:textAllCaps="true"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="#FFFFFF"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:id="@+id/divRow0"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_marginBottom="20dp"
+        android:background="@color/white"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/tvAmmoniaLabel"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Ammonia concentration row -->
+    <TextView
+        android:id="@+id/tvAmmoniaLabel"
+        android:layout_width="168dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="40dp"
+        android:background="@drawable/bubble_background"
+        android:gravity="center"
+        android:padding="4dp"
+        android:text="Amônia (NH3)"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvGasConcentrationTitle" />
+
+    <TextView
+        android:id="@+id/tvAmmoniaValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="230dp"
+        android:text="200"
+        android:textStyle="bold"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="#FFFFFF"
+        android:textSize="24sp"
+        app:layout_constraintStart_toStartOf="@+id/tvAmmoniaLabel"
+        app:layout_constraintTop_toTopOf="@+id/tvAmmoniaLabel" />
+
+    <TextView
+        android:id="@+id/tvAmmoniaUnit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:textColor="#FFFFFF"
+        android:text="ppm"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        app:layout_constraintBottom_toBottomOf="@+id/tvAmmoniaValue"
+        app:layout_constraintStart_toEndOf="@+id/tvAmmoniaValue" />
+
+    <View
+        android:id="@+id/divRow1"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@color/white"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@id/tvCarbonDioxideLabel"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvAmmoniaLabel" />
+
+    <!-- Carbon dioxide concentration row -->
+    <TextView
+        android:id="@+id/tvCarbonDioxideLabel"
+        android:layout_width="168dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="40dp"
+        android:background="@drawable/bubble_background"
+        android:gravity="center"
+        android:padding="4dp"
+        android:text="Dióxido de Carbono"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvAmmoniaLabel" />
+
+    <TextView
+        android:id="@+id/tvCarbonDioxideValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="230dp"
+        android:text="300"
+        android:textStyle="bold"
+        android:textColor="#FFFFFF"
+        android:textSize="24sp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        app:layout_constraintStart_toStartOf="@+id/tvCarbonDioxideLabel"
+        app:layout_constraintTop_toTopOf="@+id/tvCarbonDioxideLabel" />
+
+    <TextView
+        android:id="@+id/tvCarbonDioxideUnit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:textColor="#FFFFFF"
+        android:text="ppm"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        app:layout_constraintBottom_toBottomOf="@+id/tvCarbonDioxideValue"
+        app:layout_constraintStart_toEndOf="@+id/tvCarbonDioxideValue" />
+
+    <View
+        android:id="@+id/divRow2"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@color/white"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@id/tvFlameLabel"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvCarbonDioxideLabel" />
+
+    <!-- Flames detection row -->
+    <TextView
+        android:id="@+id/tvFlameLabel"
+        android:layout_width="168dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="40dp"
+        android:background="@drawable/bubble_background"
+        android:gravity="center"
+        android:padding="4dp"
+        android:text="Chamas"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvCarbonDioxideLabel" />
+
+    <TextView
+        android:id="@+id/tvFlameValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="230dp"
+        android:text="Não detectado"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="#FFFFFF"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/tvFlameLabel"
+        app:layout_constraintStart_toStartOf="@+id/tvFlameLabel"
+        app:layout_constraintTop_toTopOf="@+id/tvFlameLabel" />
+
+    <View
+        android:id="@+id/divRow3"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@color/white"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@id/tvTempLabel"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvFlameLabel" />
+
+    <!-- Temperature values row -->
+    <TextView
+        android:id="@+id/tvTempLabel"
+        android:layout_width="168dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="40dp"
+        android:background="@drawable/bubble_background"
+        android:gravity="center"
+        android:padding="4dp"
+        android:text="Temperatura 🌡️"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvFlameLabel" />
+
+    <TextView
+        android:id="@+id/tvTempValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="230dp"
+        android:text="25"
+        android:textStyle="bold"
+        android:textColor="#FFFFFF"
+        android:textSize="24sp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        app:layout_constraintStart_toStartOf="@+id/tvTempLabel"
+        app:layout_constraintBottom_toBottomOf="@+id/tvTempLabel" />
+
+    <TextView
+        android:id="@+id/tvTempUnit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:text="°C"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="#FFFFFF"
+        app:layout_constraintBottom_toBottomOf="@+id/tvTempValue"
+        app:layout_constraintStart_toEndOf="@+id/tvTempValue"
+        app:layout_constraintTop_toTopOf="@+id/tvTempValue" />
+
+    <View
+        android:id="@+id/divRow4"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@color/white"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@id/tvHumidityLabel"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvTempLabel" />
+
+    <!-- Humidity values row -->
+    <TextView
+        android:id="@+id/tvHumidityLabel"
+        android:layout_width="168dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="40dp"
+        android:background="@drawable/bubble_background"
+        android:gravity="center"
+        android:padding="4dp"
+        android:text="Umidade 💧"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvTempLabel" />
+
+    <TextView
+        android:id="@+id/tvHumidityValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="230dp"
+        android:text="90"
+        android:textStyle="bold"
+        android:textColor="#FFFFFF"
+        android:textSize="24sp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        app:layout_constraintStart_toStartOf="@+id/tvHumidityLabel"
+        app:layout_constraintTop_toTopOf="@+id/tvHumidityLabel" />
+
+    <TextView
+        android:id="@+id/tvHumidityUnit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:text="%"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="#FFFFFF"
+        app:layout_constraintBottom_toBottomOf="@+id/tvHumidityValue"
+        app:layout_constraintStart_toEndOf="@+id/tvHumidityValue"
+        app:layout_constraintTop_toTopOf="@+id/tvHumidityValue" />
+
+    <View
+        android:id="@+id/divRow5"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_marginTop="20dp"
+        android:background="@color/white"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvHumidityLabel" />
+
+    <!-- Main to Mapping Button -->
+    <Button
+        android:id="@+id/btMainToMap"
+        android:layout_width="195dp"
+        android:layout_height="51dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="42dp"
+        android:text="Ver Mapeamento"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
