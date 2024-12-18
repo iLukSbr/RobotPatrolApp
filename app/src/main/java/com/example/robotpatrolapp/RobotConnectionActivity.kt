@@ -63,7 +63,7 @@ class RobotConnectionActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        SocketManager.disconnect()
+        //SocketManager.disconnect()
     }
 }
 
