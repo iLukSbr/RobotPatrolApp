@@ -52,27 +52,29 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        try {
-            val inputStream: InputStream = socket.getInputStream()
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val inputStream: InputStream = socket.getInputStream()
 
-            while (isReceiving) {
-                val buffer = ByteArray(1024)
-                val bytesRead = inputStream.read(buffer)
+                while (isReceiving) {
+                    val buffer = ByteArray(1024)
+                    val bytesRead = inputStream.read(buffer)
 
-                if (bytesRead > 0) {
-                    val receivedMessage = String(buffer, 0, bytesRead)
+                    if (bytesRead > 0) {
+                        val receivedMessage = String(buffer, 0, bytesRead)
 
-                    withContext(Dispatchers.Main) {
-                        tvAmmonia.text = receivedMessage
+                        withContext(Dispatchers.Main) {
+                            tvAmmonia.text = receivedMessage
+                        }
                     }
                 }
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            withContext(Dispatchers.Main) {
-                tvAmmonia.text = "NaN"
+            } catch (e: Exception) {
+                e.printStackTrace()
+                withContext(Dispatchers.Main) {
+                    tvAmmonia.text = "NaN"
+                }
             }
         }
     }
-    
+
 }

@@ -284,6 +284,19 @@
 
     <!-- Main to Mapping Button -->
     <Button
+        android:id="@+id/btStopOrRun"
+        android:layout_width="155dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="12dp"
+        android:backgroundTint="#CC0101"
+        android:text="Andar/Parar"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/divRow5" />
+
+    <!-- Main to Mapping Button -->
+    <Button
         android:id="@+id/btMainToMap"
         android:layout_width="195dp"
         android:layout_height="51dp"
