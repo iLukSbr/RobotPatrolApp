@@ -13,7 +13,7 @@
         android:id="@+id/tvConnectionTitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="100dp"
+        android:layout_marginTop="72dp"
         android:gravity="center"
         android:text="Conectar com o Robô"
         android:textColor="#FFFFFF"
@@ -29,7 +29,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="72dp"
-        android:text="Digite o endereço IP do Raspberry Pi:"
+        android:text="Endereço IP:"
         android:textColor="#FFFFFF"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -39,27 +39,54 @@
     <!-- IP Address Input -->
     <EditText
         android:id="@+id/etIpAddress"
-        android:layout_width="0dp"
+        android:layout_width="323dp"
         android:layout_height="48dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="12dp"
         android:hint="192.168.x.x"
         android:inputType="text"
         android:textColorHint="#FFFFFF"
+        android:textColor="#FFFFFF"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvIpAddressLabel" />
+
+    <TextView
+        android:id="@+id/tvPortNumberLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Número de porta:"
+        android:textColor="#FFFFFF"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/etIpAddress" />
+
+
+    <EditText
+        android:id="@+id/etPortNumber"
+        android:layout_width="323dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="12dp"
+        android:hint="11111"
+        android:inputType="number"
+        android:textColorHint="#FFFFFF"
+        android:textColor="#FFFFFF"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvPortNumberLabel" />
 
     <!-- Connect Button -->
     <Button
         android:id="@+id/btnConnect"
         android:layout_width="192dp"
         android:layout_height="62dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="16dp"
         android:text="Conectar"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/etIpAddress" />
+        app:layout_constraintTop_toBottomOf="@id/etPortNumber" />
 
     <!-- Status Message -->
     <TextView
@@ -91,6 +118,7 @@
         android:layout_width="185dp"
         android:layout_height="179dp"
         android:layout_marginBottom="34dp"
+        android:contentDescription="null"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
