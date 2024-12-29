@@ -74,16 +74,14 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
     }
+    
+    private var lastFlameState: Int? = null // Armazena o último estado de chama
 
     private suspend fun receiveData() {
         val socket = SocketManager.socket
         if (socket == null) {
             withContext(Dispatchers.Main) {
-                tvCarbonDioxide.text = "0"
-                tvTemperature.text = "0"
-                tvHumidity.text = "0"
-                tvAmmonia.text = "0"
-                tvFlame.text = "0"
+                resetSensorValues()
             }
             return
         }
@@ -97,37 +95,48 @@ class MainActivity : AppCompatActivity() {
                     val bytesRead = inputStream.read(buffer)
 
                     if (bytesRead > 0) {
-                        val receivedMessage = String(buffer, 0, bytesRead)
-
-                        // Separates message based on ','
+                        val receivedMessage = String(buffer, 0, bytesRead).trim()
                         val parts = receivedMessage.split(",")
+
+                        if (parts.size < 5) {
+                            continue // Ignorar mensagens incompletas
+                        }
 
                         withContext(Dispatchers.Main) {
                             val co2 = parts.getOrNull(0)?.toFloatOrNull() ?: 0f
                             val temp = parts.getOrNull(1)?.toFloatOrNull() ?: 0f
                             val humidity = parts.getOrNull(2)?.toFloatOrNull() ?: 0f
                             val nh3 = parts.getOrNull(3)?.toFloatOrNull() ?: 0f
-                            val flame = parts.getOrNull(4)?.toIntOrNull() ?: 0
+                            val flame = parts.getOrNull(4)?.toIntOrNull() ?: -1
 
+                            // Atualizar valores de sensores
                             tvCarbonDioxide.text = String.format("%.2f ppm", co2)
                             tvTemperature.text = String.format("%.2f °C", temp)
                             tvHumidity.text = String.format("%.2f %%", humidity)
                             tvAmmonia.text = String.format("%.2f ppm", nh3)
-                            tvFlame.text = if (flame == 1) "Detectada" else "Não detectada"
-                            //tvFlame.text = String.format("%.2f", flame)
+
+                            // Validar e atualizar estado da chama
+                            if (flame in 0..1) {
+                                if (lastFlameState != flame) {
+                                    lastFlameState = flame
+                                    tvFlame.text = if (flame == 1) "Detectada" else "Não detectada"
+                                }
+                            }
 
                             // Verificar níveis e disparar notificações
-                            if (co2 > 1000) { // Exemplo: limite de CO2 alto
-                                showNotification(1, "Alerta de CO2!", "Nível de CO₂ muito alto: $co2 ppm.")
-                                delay(3000) // Atraso de 3 segundos
-                            }
-                            if (nh3 > 50) { // Exemplo: limite de NH3 alto
-                                showNotification(2, "Alerta de Amônia!", "Nível de NH₃ muito alto: $nh3 ppm.")
-                                delay(3000) // Atraso de 3 segundos
-                            }
-                            if (flame == 1) { // Exemplo: chama detectada
-                                showNotification(3, "Alerta de Chama!", "Presença de chama detectada!")
-                                delay(3000) // Atraso de 3 segundos
+                            launch {
+                                if (co2 > 1000) {
+                                    showNotification(1, "Alerta de CO2!", "Nível de CO2 muito alto: $co2 ppm.")
+                                    delay(3000)
+                                }
+                                if (nh3 > 50) {
+                                    showNotification(2, "Alerta de Amônia!", "Nível de NH3 muito alto: $nh3 ppm.")
+                                    delay(3000)
+                                }
+                                if (flame == 1) {
+                                    showNotification(3, "Alerta de Chama!", "Presença de chama detectada!")
+                                    delay(3000)
+                                }
                             }
                         }
                     }
@@ -135,15 +144,21 @@ class MainActivity : AppCompatActivity() {
             } catch (e: Exception) {
                 e.printStackTrace()
                 withContext(Dispatchers.Main) {
-                    tvCarbonDioxide.text = "NaN"
-                    tvTemperature.text = "NaN"
-                    tvHumidity.text = "NaN"
-                    tvAmmonia.text = "NaN"
-                    tvFlame.text = "NaN"
+                    resetSensorValues()
                 }
             }
         }
     }
+
+    private fun resetSensorValues() {
+        tvCarbonDioxide.text = "NaN"
+        tvTemperature.text = "NaN"
+        tvHumidity.text = "NaN"
+        tvAmmonia.text = "NaN"
+        tvFlame.text = "NaN"
+        lastFlameState = null
+    }
+
 
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
