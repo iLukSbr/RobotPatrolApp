@@ -37,6 +37,7 @@ android {
 
 dependencies {
 
+    implementation (libs.androidx.core.ktx) // Certifique-se de ter uma versão recente
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
