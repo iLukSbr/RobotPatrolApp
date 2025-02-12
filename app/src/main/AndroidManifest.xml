@@ -15,17 +15,17 @@
         android:theme="@style/Theme.RobotPatrolApp"
         tools:targetApi="31">
         <activity
+            android:name=".RobotConnectionActivity"
+            android:exported="false" />
+
+        <activity
             android:name=".MappingActivity"
             android:exported="false" />
         <activity
             android:name=".MainActivity"
-            android:exported="false" />
-        <activity
-            android:name=".RobotConnectionActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
