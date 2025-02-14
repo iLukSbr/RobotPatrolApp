@@ -13,15 +13,21 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.BufferedReader
 import java.io.InputStream
+import java.io.InputStreamReader
 import kotlin.math.cos
 import kotlin.math.sin
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.decodeFromString
 
 
 class MappingActivity : AppCompatActivity() {
 
     private lateinit var mapView: MapView
     private var isReceiving = true
+    private val jsonParser = Json { ignoreUnknownKeys = true }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,7 +39,7 @@ class MappingActivity : AppCompatActivity() {
             insets
         }
 
-        // Find the button "Voltar"
+        // Find the button to go back to previous activity
         val btnBackToMain = findViewById<Button>(R.id.btnBackToMain)
 
         // Set an onClickListener
@@ -42,47 +48,16 @@ class MappingActivity : AppCompatActivity() {
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
         }
+        mapView = findViewById(R.id.mapPlaceholder)
+        mapView.setStartingPosition(500f, 500f, 1.5708f)
 
+        //Establishes the connection and runs the mapping
         CoroutineScope(Dispatchers.IO).launch {
             receiveData()
         }
-
-        mapView = findViewById(R.id.mapPlaceholder)
-        mapView.setStartingPosition(500f, 500f, 1.5708f)
     }
 
-    // DELETE
-        //val handler = Handler(Looper.getMainLooper())
-
-//        val dist = 10f
-//        var theta = 0f
-//        val thetaValues = arrayOf(0f, 0f, 10f, 20f, 0f, 0f, 80f)
-//        var i = 0
-
-//        val updateRunnable = object : Runnable {
-//            override fun run(distTra) {
-//                // Simulating new robot position data
-//                val newX = mapView.getPositionX() + (dist * cos(mapView.getPositionTheta()*theta/2))
-//                val newY = mapView.getPositionY() + (dist * sin(mapView.getPositionTheta()*theta/2))
-//                val newTheta = mapView.getPositionTheta() + theta
-//
-//                // Update robot position with new simulated values
-//                val newPosition = RobotPosition(newX, newY, newTheta)
-//                mapView.updatePosition(newPosition)
-//
-//                // Increment the angle and loop
-//                if(i>thetaValues.size-1)
-//                    i = 0
-//                theta = thetaValues[i]
-//                i += 1
-//
-//                handler.postDelayed(this, 100)  // Update every 100ms
-//            }
-//        }
-//        handler.post(updateRunnable)
-
-
-    private fun run(distTraveledCm: Float, angle: Float) {
+    private fun run(distTraveledCm: Float, angle: Float, obsDistance: Float) {
         // Passing new position data
         val newX = mapView.getPositionX() + (distTraveledCm * cos(mapView.getPositionTheta()*angle/2))
         val newY = mapView.getPositionY() + (distTraveledCm * sin(mapView.getPositionTheta()*angle/2))
@@ -91,6 +66,8 @@ class MappingActivity : AppCompatActivity() {
 
         // Update robot position with new values
         val newPosition = RobotPosition(newX, newY, newTheta)
+        if(obsDistance > 50)
+            mapView.addObstacle(newX + obsDistance * cos(newTheta), newY + obsDistance * sin(newTheta))
         mapView.updatePosition(newPosition)
     }
 
@@ -105,26 +82,23 @@ class MappingActivity : AppCompatActivity() {
 
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val inputStream: InputStream = socket.getInputStream()
+                //val inputStream: InputStream = socket.getInputStream()
+                val reader = BufferedReader(InputStreamReader(socket.getInputStream()))
+
 
                 while (isReceiving) {
-                    val buffer = ByteArray(1024)
-                    val bytesRead = inputStream.read(buffer)
+                    //val buffer = ByteArray(1024)
+                    //val bytesRead = inputStream.read(buffer)
+                    val jsonString = reader.readLine() ?: break
+                    val robotData = jsonParser.decodeFromString<RobotData>(jsonString)
 
-                    if (bytesRead > 0) {
-                        val receivedMessage = String(buffer, 0, bytesRead).trim()
-                        val parts = receivedMessage.split(",")
-
-                        if (parts.size < 7) {
-                            continue // Ignore incomplete messages
-                        }
-
-                        withContext(Dispatchers.Main) {
-                            val distTraveledCm = parts.getOrNull(5)?.toFloatOrNull() ?: 0f
-                            val angle = parts.getOrNull(6)?.toFloatOrNull() ?: 0f
-                            run(distTraveledCm, angle)
-                        }
+                    withContext(Dispatchers.Main) {
+                        val distTraveledCm = robotData.traveled.front_right
+                        val angle = robotData.gyroscope.z
+                        val obsDistance = robotData.distance.front
+                        run(distTraveledCm.toFloat(), angle.toFloat(), obsDistance.toFloat())
                     }
+                    delay(1000)
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -138,6 +112,5 @@ class MappingActivity : AppCompatActivity() {
     private fun resetMapping() {
         mapView.resetCanvas()
     }
-
 }
 

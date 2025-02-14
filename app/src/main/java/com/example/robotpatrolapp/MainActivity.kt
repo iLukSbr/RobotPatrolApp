@@ -19,6 +19,9 @@ import androidx.core.view.WindowInsetsCompat
 import kotlinx.coroutines.*
 import java.io.InputStream
 import androidx.core.app.ActivityCompat
+import kotlinx.serialization.json.Json
+import java.io.BufferedReader
+import java.io.InputStreamReader
 
 
 class MainActivity : AppCompatActivity() {
@@ -30,6 +33,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var tvFlame: TextView
     private var isReceiving = true // Control flag to stop receiving when needed
     private val channelId = "sensor_alert_channel" // Notification channel
+    private val jsonParser = Json { ignoreUnknownKeys = true }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,7 +79,80 @@ class MainActivity : AppCompatActivity() {
         }
     }
     
-    private var lastFlameState: Int? = null // Armazena o último estado de chama
+    private var lastFlameState: Boolean = false // Armazena o último estado de chama
+
+//    private suspend fun receiveData() {
+//        val socket = SocketManager.socket
+//        if (socket == null) {
+//            withContext(Dispatchers.Main) {
+//                resetSensorValues()
+//            }
+//            return
+//        }
+//
+//        CoroutineScope(Dispatchers.IO).launch {
+//            try {
+//                val inputStream: InputStream = socket.getInputStream()
+//
+//                while (isReceiving) {
+//                    val buffer = ByteArray(1024)
+//                    val bytesRead = inputStream.read(buffer)
+//
+//                    if (bytesRead > 0) {
+//                        val receivedMessage = String(buffer, 0, bytesRead).trim()
+//                        val parts = receivedMessage.split(",")
+//
+//                        if (parts.size < 5) {
+//                            continue // Ignorar mensagens incompletas
+//                        }
+//
+//                        withContext(Dispatchers.Main) {
+//                            val co2 = parts.getOrNull(0)?.toFloatOrNull() ?: 0f
+//                            val temp = parts.getOrNull(1)?.toFloatOrNull() ?: 0f
+//                            val humidity = parts.getOrNull(2)?.toFloatOrNull() ?: 0f
+//                            val nh3 = parts.getOrNull(3)?.toFloatOrNull() ?: 0f
+//                            val flame = parts.getOrNull(4)?.toIntOrNull() ?: -1
+//
+//                            // Atualizar valores de sensores
+//                            tvCarbonDioxide.text = String.format("%.2f", co2)
+//                            tvTemperature.text = String.format("%.2f", temp)
+//                            tvHumidity.text = String.format("%.2f", humidity)
+//                            tvAmmonia.text = String.format("%.2f", nh3)
+//
+//                            // Validar e atualizar estado da chama
+//                            if (flame in 0..1) {
+//                                if (lastFlameState != flame) {
+//                                    lastFlameState = flame
+//                                    tvFlame.text = if (flame == 1) "Detectada" else "Não detectada"
+//                                }
+//                            }
+//
+//                            // Verificar níveis e disparar notificações
+//                            launch {
+//                                if (co2 > 1000) {
+//                                    showNotification(1, "Alerta de CO2!", "Nível de CO2 muito alto: $co2 ppm.")
+//                                    delay(3000)
+//                                }
+//                                if (nh3 > 80) {
+//                                    showNotification(2, "Alerta de Amônia!", "Nível de NH3 muito alto: $nh3 ppb.")
+//                                    delay(3000)
+//                                }
+//                                if (flame == 1) {
+//                                    showNotification(3, "Alerta de Chama!", "Presença de chama detectada!")
+//                                    delay(3000)
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//            } catch (e: Exception) {
+//                e.printStackTrace()
+//                withContext(Dispatchers.Main) {
+//                    resetSensorValues()
+//                }
+//            }
+//        }
+//    }
 
     private suspend fun receiveData() {
         val socket = SocketManager.socket
@@ -88,55 +165,47 @@ class MainActivity : AppCompatActivity() {
 
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val inputStream: InputStream = socket.getInputStream()
+                val reader = BufferedReader(InputStreamReader(socket.getInputStream()))
 
                 while (isReceiving) {
-                    val buffer = ByteArray(1024)
-                    val bytesRead = inputStream.read(buffer)
+                    val jsonString = reader.readLine() ?: break
+                    val robotData = jsonParser.decodeFromString<RobotData>(jsonString)
 
-                    if (bytesRead > 0) {
-                        val receivedMessage = String(buffer, 0, bytesRead).trim()
-                        val parts = receivedMessage.split(",")
+                    withContext(Dispatchers.Main) {
+                        val co2 = robotData.co2
+                        val temp = robotData.temperature
+                        val humidity = robotData.humidity
+                        val nh3 = robotData.nh3
+                        val flame = robotData.flame
 
-                        if (parts.size < 5) {
-                            continue // Ignorar mensagens incompletas
-                        }
+                        // Atualizar valores de sensores
+                        tvCarbonDioxide.text = String.format("%.2f", co2)
+                        tvTemperature.text = String.format("%.2f", temp)
+                        tvHumidity.text = String.format("%.2f", humidity)
+                        tvAmmonia.text = String.format("%.2f", nh3)
 
-                        withContext(Dispatchers.Main) {
-                            val co2 = parts.getOrNull(0)?.toFloatOrNull() ?: 0f
-                            val temp = parts.getOrNull(1)?.toFloatOrNull() ?: 0f
-                            val humidity = parts.getOrNull(2)?.toFloatOrNull() ?: 0f
-                            val nh3 = parts.getOrNull(3)?.toFloatOrNull() ?: 0f
-                            val flame = parts.getOrNull(4)?.toIntOrNull() ?: -1
+                        // Validar e atualizar estado da chama
+                        tvFlame.text = if (flame) "Detectada" else "Não detectada"
+//                        if (flame in 0..1) {
+//                            if (lastFlameState != flame) {
+//                                lastFlameState = flame
+//                                tvFlame.text = if (flame) "Detectada" else "Não detectada"
+//                            }
+//                        }
 
-                            // Atualizar valores de sensores
-                            tvCarbonDioxide.text = String.format("%.2f ppm", co2)
-                            tvTemperature.text = String.format("%.2f °C", temp)
-                            tvHumidity.text = String.format("%.2f %%", humidity)
-                            tvAmmonia.text = String.format("%.2f ppm", nh3)
-
-                            // Validar e atualizar estado da chama
-                            if (flame in 0..1) {
-                                if (lastFlameState != flame) {
-                                    lastFlameState = flame
-                                    tvFlame.text = if (flame == 1) "Detectada" else "Não detectada"
-                                }
+                        // Verificar níveis e disparar notificações
+                        launch {
+                            if (co2 > 1000) {
+                                showNotification(1, "Alerta de CO2!", "Nível de CO2 muito alto: $co2 ppm.")
+                                delay(3000)
                             }
-
-                            // Verificar níveis e disparar notificações
-                            launch {
-                                if (co2 > 1000) {
-                                    showNotification(1, "Alerta de CO2!", "Nível de CO2 muito alto: $co2 ppm.")
-                                    delay(3000)
-                                }
-                                if (nh3 > 50) {
-                                    showNotification(2, "Alerta de Amônia!", "Nível de NH3 muito alto: $nh3 ppm.")
-                                    delay(3000)
-                                }
-                                if (flame == 1) {
-                                    showNotification(3, "Alerta de Chama!", "Presença de chama detectada!")
-                                    delay(3000)
-                                }
+                            if (nh3 > 80) {
+                                showNotification(2, "Alerta de Amônia!", "Nível de NH3 muito alto: $nh3 ppb.")
+                                delay(3000)
+                            }
+                            if (flame) {
+                                showNotification(3, "Alerta de Chama!", "Presença de chama detectada!")
+                                delay(3000)
                             }
                         }
                     }
@@ -156,7 +225,7 @@ class MainActivity : AppCompatActivity() {
         tvHumidity.text = "NaN"
         tvAmmonia.text = "NaN"
         tvFlame.text = "NaN"
-        lastFlameState = null
+        lastFlameState = false
     }
 
 

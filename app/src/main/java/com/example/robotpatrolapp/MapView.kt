@@ -5,18 +5,16 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Path
-import android.graphics.PathMeasure
 import android.util.AttributeSet
 import android.view.View
 import com.example.robotpatrolapp.model.RobotPosition
-import kotlin.math.cos
-import kotlin.math.sin
 
 class MapView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) : View(context, attrs) {
     private var robotPosition: RobotPosition = RobotPosition(0f, 0f, 0f)
     private val robotPath = Path()
     private var scaleFactor = 1f  // Initial zoom level
     private val zoomOutFactor = 0.9f  // How much to zoom out each time
+    private val obstacles = mutableListOf<Pair<Float, Float>>() //List of obstacles coordinates
     //private val robotPathMeasure = PathMeasure(robotPath, false)
 
     private val robotPaint: Paint = Paint().apply {
@@ -39,6 +37,11 @@ class MapView @JvmOverloads constructor(context: Context, attrs: AttributeSet? =
         strokeWidth = 8f
         style = Paint.Style.FILL
         isAntiAlias = true
+    }
+
+    private val obstaclePaint = Paint().apply {
+        color = Color.BLUE
+        style = Paint.Style.FILL
     }
 
     // Method to set a new starting position
@@ -83,8 +86,12 @@ class MapView @JvmOverloads constructor(context: Context, attrs: AttributeSet? =
         // Draw path
         canvas.drawPath(robotPath, pathPaint)
 
-        //canvas.drawLine(canvasX, canvasY, endX, endY, orientationPaint)
+        //Draw the direction arrow
         drawArrow(canvas, canvasX, canvasY, robotPosition.theta)
+
+        for ((x, y) in obstacles) {
+            canvas.drawCircle(x, y, 20f, obstaclePaint)
+        }
     }
 
     private fun drawArrow(canvas: Canvas, x: Float, y: Float, angle: Float) {
@@ -129,6 +136,11 @@ class MapView @JvmOverloads constructor(context: Context, attrs: AttributeSet? =
 
     fun getPositionTheta():  Float{
         return robotPosition.theta
+    }
+
+    fun addObstacle(x: Float, y: Float) {
+        obstacles.add(Pair(x, y))
+        invalidate()  // Refresh view
     }
 
     fun resetCanvas() {
