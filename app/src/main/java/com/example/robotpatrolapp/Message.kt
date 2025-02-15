@@ -50,5 +50,23 @@ fun parseJson(jsonString: String): RobotData {
 }
 
 /*
-{"distance": {"front": -1, "right": -1, "left": -1, "rear": -1}, "bus_voltage": 0, "temperature": 29.5135, "timestamp": "2025-02-12T12:06:31", "gyroscope": {"y": -0.00290161, "x": 0.003512475, "z": 0.01893682}, "speed": {"front_left": 0.0, "rear_left": 0.0, "rear_right": 0.0, "front_right": 48.47324}, "humidity": 52.64163, "magnetometer": {"y": 27.63636, "x": -3.0, "z": 4.591837}, "power": 0.0, "co2_alarm": false, "pressure": 913.1486, "co2": 398, "nh3": 78.78351, "battery_percentage": 0, "raw_nh3": 212, "flame": true, "nh3_alarm": false, "traveled": {"front_left": 0.0, "rear_left": 0.0, "rear_right": 0.0, "front_right": 13.98408}, "current": 0, "accelerometer": {"y": -1.627904, "x": -0.392266, "z": 8.355266}}
+{"distance": {"front": -1, "right": -1, "left": -1, "rear": -1},
+"bus_voltage": 0, "temperature": 29.5135,
+"timestamp": "2025-02-12T12:06:31",
+"gyroscope": {"y": -0.00290161, "x": 0.003512475, "z": 0.01893682},
+"speed": {"front_left": 0.0, "rear_left": 0.0, "rear_right": 0.0, "front_right": 48.47324},
+"humidity": 52.64163,
+"magnetometer": {"y": 27.63636, "x": -3.0, "z": 4.591837},
+"power": 0.0,
+"co2_alarm": false,
+"pressure": 913.1486,
+"co2": 398,
+"nh3": 78.78351,
+"battery_percentage": 0,
+"raw_nh3": 212,
+"flame": true,
+"nh3_alarm": false,
+"traveled": {"front_left": 0.0, "rear_left": 0.0, "rear_right": 0.0, "front_right": 13.98408},
+"current": 0,
+"accelerometer": {"y": -1.627904, "x": -0.392266, "z": 8.355266}}
  */

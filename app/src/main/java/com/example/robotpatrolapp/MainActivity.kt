@@ -5,6 +5,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.pm.PackageManager
 import android.content.Intent
+import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.widget.Button
@@ -22,6 +23,7 @@ import androidx.core.app.ActivityCompat
 import kotlinx.serialization.json.Json
 import java.io.BufferedReader
 import java.io.InputStreamReader
+import java.util.Locale
 
 
 class MainActivity : AppCompatActivity() {
@@ -179,10 +181,10 @@ class MainActivity : AppCompatActivity() {
                         val flame = robotData.flame
 
                         // Atualizar valores de sensores
-                        tvCarbonDioxide.text = String.format("%.2f", co2)
-                        tvTemperature.text = String.format("%.2f", temp)
-                        tvHumidity.text = String.format("%.2f", humidity)
-                        tvAmmonia.text = String.format("%.2f", nh3)
+                        tvCarbonDioxide.text = String.format(Locale.getDefault(), "%.2f", co2)
+                        tvTemperature.text = String.format(Locale.getDefault(), "%.2f", temp)
+                        tvHumidity.text = String.format(Locale.getDefault(),"%.2f", humidity)
+                        tvAmmonia.text = String.format(Locale.getDefault(),"%.2f", nh3)
 
                         // Validar e atualizar estado da chama
                         tvFlame.text = if (flame) "Detectada" else "Não detectada"
@@ -196,14 +198,17 @@ class MainActivity : AppCompatActivity() {
                         // Verificar níveis e disparar notificações
                         launch {
                             if (co2 > 1000) {
+                                //tvCarbonDioxide.setBackgroundColor(Color.RED)
                                 showNotification(1, "Alerta de CO2!", "Nível de CO2 muito alto: $co2 ppm.")
                                 delay(3000)
                             }
                             if (nh3 > 80) {
+                                //tvAmmonia.setBackgroundColor(Color.RED)
                                 showNotification(2, "Alerta de Amônia!", "Nível de NH3 muito alto: $nh3 ppb.")
                                 delay(3000)
                             }
                             if (flame) {
+                                //tvFlame.setBackgroundColor(Color.RED)
                                 showNotification(3, "Alerta de Chama!", "Presença de chama detectada!")
                                 delay(3000)
                             }

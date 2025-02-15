@@ -48,7 +48,7 @@
         android:padding="4dp"
         android:text="Amônia (NH3)"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        android:textSize="15sp"
+        android:textSize="13sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvGasConcentrationTitle" />
@@ -98,6 +98,7 @@
         android:gravity="center"
         android:padding="4dp"
         android:text="Dióxido de Carbono"
+        android:textSize="13sp"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
@@ -149,7 +150,7 @@
         android:padding="4dp"
         android:text="Chamas"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        android:textSize="15sp"
+        android:textSize="13sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvCarbonDioxideLabel" />
@@ -190,7 +191,7 @@
         android:padding="4dp"
         android:text="Temperatura 🌡️"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        android:textSize="15sp"
+        android:textSize="13sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvFlameLabel" />
@@ -242,7 +243,7 @@
         android:padding="4dp"
         android:text="Umidade 💧"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        android:textSize="15sp"
+        android:textSize="13sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvTempLabel" />

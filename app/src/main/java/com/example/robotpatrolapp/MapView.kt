@@ -5,6 +5,7 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Path
+import android.graphics.Rect
 import android.util.AttributeSet
 import android.view.View
 import com.example.robotpatrolapp.model.RobotPosition
@@ -22,9 +23,9 @@ class MapView @JvmOverloads constructor(context: Context, attrs: AttributeSet? =
         style = Paint.Style.FILL
     }
 
-    private val pathPaint: Paint = Paint().apply {
-        color = Color.RED
-        strokeWidth = 30f
+    val pathPaint: Paint = Paint().apply {
+        color = Color.parseColor("#66FF66")
+        strokeWidth = 125f
         style = Paint.Style.STROKE
         strokeCap = Paint.Cap.ROUND
         strokeJoin = Paint.Join.ROUND
@@ -33,8 +34,8 @@ class MapView @JvmOverloads constructor(context: Context, attrs: AttributeSet? =
     }
 
     private val arrowPaint = Paint().apply {
-        color = Color.GREEN  // Arrow color
-        strokeWidth = 8f
+        color = Color.BLACK  // Arrow color
+        strokeWidth = 10f
         style = Paint.Style.FILL
         isAntiAlias = true
     }
@@ -81,7 +82,7 @@ class MapView @JvmOverloads constructor(context: Context, attrs: AttributeSet? =
         canvas.scale(scaleFactor, scaleFactor, width / 2f, height / 2f)
 
         // Draw the robot as a red circle
-        canvas.drawCircle(canvasX, canvasY, 40f, robotPaint)
+        //canvas.drawCircle(canvasX, canvasY, 40f, robotPaint)
 
         // Draw path
         canvas.drawPath(robotPath, pathPaint)
@@ -109,7 +110,7 @@ class MapView @JvmOverloads constructor(context: Context, attrs: AttributeSet? =
 
         // Move canvas to robot's position and rotate
         canvas.translate(x, y)
-        canvas.rotate(angle)
+        canvas.rotate(angle*180/3.14159f + 90)
 
         // Draw the rotated arrow
         canvas.drawPath(arrowPath, arrowPaint)
