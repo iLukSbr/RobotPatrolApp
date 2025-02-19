@@ -62,7 +62,7 @@
         android:textStyle="bold"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         android:textColor="#FFFFFF"
-        android:textSize="24sp"
+        android:textSize="22sp"
         app:layout_constraintStart_toStartOf="@+id/tvAmmoniaLabel"
         app:layout_constraintTop_toTopOf="@+id/tvAmmoniaLabel" />
 
@@ -112,7 +112,7 @@
         android:text="300"
         android:textStyle="bold"
         android:textColor="#FFFFFF"
-        android:textSize="24sp"
+        android:textSize="22sp"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         app:layout_constraintStart_toStartOf="@+id/tvCarbonDioxideLabel"
         app:layout_constraintTop_toTopOf="@+id/tvCarbonDioxideLabel" />
@@ -204,7 +204,7 @@
         android:text="25"
         android:textStyle="bold"
         android:textColor="#FFFFFF"
-        android:textSize="24sp"
+        android:textSize="22sp"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         app:layout_constraintStart_toStartOf="@+id/tvTempLabel"
         app:layout_constraintBottom_toBottomOf="@+id/tvTempLabel" />
@@ -256,7 +256,7 @@
         android:text="90"
         android:textStyle="bold"
         android:textColor="#FFFFFF"
-        android:textSize="24sp"
+        android:textSize="22sp"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         app:layout_constraintStart_toStartOf="@+id/tvHumidityLabel"
         app:layout_constraintTop_toTopOf="@+id/tvHumidityLabel" />
@@ -283,7 +283,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvHumidityLabel" />
 
-    <!-- Main to Mapping Button -->
+    <!-- Main to Mapping Button
     <Button
         android:id="@+id/btStopOrRun"
         android:layout_width="155dp"
@@ -295,6 +295,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/divRow5" />
+    -->
 
     <!-- Main to Mapping Button -->
     <Button

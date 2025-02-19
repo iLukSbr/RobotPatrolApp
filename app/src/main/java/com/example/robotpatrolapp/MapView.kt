@@ -91,7 +91,7 @@ class MapView @JvmOverloads constructor(context: Context, attrs: AttributeSet? =
         drawArrow(canvas, canvasX, canvasY, robotPosition.theta)
 
         for ((x, y) in obstacles) {
-            canvas.drawCircle(x, y, 20f, obstaclePaint)
+            canvas.drawCircle(x, y, 30f, obstaclePaint)
         }
     }
 

@@ -62,9 +62,13 @@ class MappingActivity : AppCompatActivity() {
     }
 
     private fun run(distTraveledCm: Float, angle: Float, obsDistance: Float, isNotSafe: Boolean) {
+        if(obsDistance < 50f && obsDistance > 0f)
+            mapView.addObstacle(mapView.getPositionX() + obsDistance * cos(mapView.getPositionTheta()), mapView.getPositionY() + obsDistance * sin(mapView.getPositionTheta()))
+
         // Passing new position data
         var newTheta = mapView.getPositionTheta() + angle * 0.1f
         newTheta %= 6.283185f
+        Log.d(MAINTAG, "Theta: $newTheta")
         val newX = mapView.getPositionX() + (distTraveledCm * cos(newTheta))
         val newY = mapView.getPositionY() + (distTraveledCm * sin(newTheta))
 
@@ -76,8 +80,6 @@ class MappingActivity : AppCompatActivity() {
         else
             mapView.pathPaint.color = Color.parseColor("#66FF66")
 
-        if(obsDistance > 50)
-            mapView.addObstacle(newX + obsDistance * cos(newTheta), newY + obsDistance * sin(newTheta))
         mapView.updatePosition(newPosition)
     }
 
@@ -92,13 +94,10 @@ class MappingActivity : AppCompatActivity() {
 
         withContext(Dispatchers.IO) {
             try {
-                //val inputStream: InputStream = socket.getInputStream()
                 var reader = BufferedReader(InputStreamReader(socket.getInputStream()))
                 Log.d(MAINTAG, "Started")
                 while (isReceiving) {
                     reader = BufferedReader(InputStreamReader(socket.getInputStream()))
-                    //val buffer = ByteArray(1024)
-                    //val bytesRead = inputStream.read(buffer)
                     val jsonString = StringBuilder()
                     if(socket.isClosed || !socket.isConnected) Log.e(MAINTAG, "Socket error")
 
@@ -131,12 +130,12 @@ class MappingActivity : AppCompatActivity() {
                         robotData.objectDist = extractNestedJsonValue(json, "distance", "front")?.toDouble()!!
                         distTraveledCm = ((robotData.distanceTraveledRearLeft + robotData.distanceTraveledRearRight + robotData.distanceTraveledFrontLeft) / 3) - distTraveledCm
                         Log.d(MAINTAG, "$robotData")
-                        val angle = 0f
+                        val angle = robotData.gyroscopeZ
                         val isNotSafe = robotData.co2 > 1000  || robotData.nh3 > 80
-                        run(distTraveledCm.toFloat(), angle, -1f, isNotSafe)
+                        run(distTraveledCm.toFloat(), angle.toFloat(), robotData.objectDist.toFloat(), isNotSafe)
                         Log.d(MAINTAG, "ran success")
 
-                        delay(500)
+                        delay(1000)
                     }
                 }
             } catch (e: Exception) {

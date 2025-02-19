@@ -48,7 +48,7 @@ class RobotConnectionActivity : AppCompatActivity() {
                         tvStatus.setTextColor(Color.GREEN)
 
                         // Navigate to MainActivity
-                        val intent = Intent(this@RobotConnectionActivity, MappingActivity::class.java)
+                        val intent = Intent(this@RobotConnectionActivity, MainActivity::class.java)
                         startActivity(intent)
                         finish()
                     }

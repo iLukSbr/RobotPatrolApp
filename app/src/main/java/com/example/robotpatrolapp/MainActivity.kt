@@ -36,6 +36,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var tvHumidity: TextView
     private lateinit var tvAmmonia: TextView
     private lateinit var tvFlame: TextView
+    private lateinit var tvCarbonDioxideLabel: TextView
+    private lateinit var tvAmmoniaLabel: TextView
+    private lateinit var tvFlameLabel: TextView
     private var isReceiving = true // Control flag to stop receiving when needed
     private val channelId = "sensor_alert_channel" // Notification channel
     private val jsonParser = Json { ignoreUnknownKeys = true }
@@ -71,6 +74,9 @@ class MainActivity : AppCompatActivity() {
         tvHumidity = findViewById(R.id.tvHumidityValue)
         tvAmmonia = findViewById(R.id.tvAmmoniaValue)
         tvFlame = findViewById(R.id.tvFlameValue)
+        tvCarbonDioxideLabel = findViewById(R.id.tvCarbonDioxideLabel)
+        tvAmmoniaLabel = findViewById(R.id.tvAmmoniaLabel)
+        tvFlameLabel = findViewById(R.id.tvFlameLabel)
 
 
         createNotificationChannel()
@@ -148,81 +154,65 @@ class MainActivity : AppCompatActivity() {
                         //if (char == '}') break // Assuming JSON ends with `}`
                     }
                     Log.d(MAINTAG, "Saiu: ")
-                    //val line = reader.readLine() ?: break
-                    //if (line.isEmpty()) Log.e(TAG, "Line empty")
-                    //jsonString.append(line)
                     val json = jsonString.toString()
                     Log.d(MAINTAG, "Received data: $json")
 
 
-
-
-//                    if (reader.ready()) {
-//                        val jsonString = reader.readLine() ?: break
-//                        Log.d("SocketDebug", "Received data: $jsonString")
-//                    } else {
-//                        tvHumidity.text = "999"
-//                        Log.d("SocketDebug", "No data available")
-//                        delay(100) // Wait for data
-//                    }
-                    //val robotData = jsonParser.decodeFromString<RobotData>(json)
-                    Log.d(MAINTAG, "Passed data")
+                    val robotData = RobotInfo()
 
                     withContext(Dispatchers.Main) {
-//                        val co2 = robotData.co2
-//                        val temp = robotData.temperature
-//                        val humidity = robotData.humidity
-//                        val nh3 = robotData.nh3
-//                        val flame = robotData.flame
-                        val co2 = extractJsonValue(json, "co2")
-                        val temp = extractJsonValue(json, "temperature")
-                        val humidity = extractJsonValue(json, "humidity")
-                        val nh3 = extractJsonValue(json, "nh3")
-                        val flame = extractJsonValue(json, "flame")
+//                        val co2 = extractJsonValue(json, "co2")
+//                        val temp = extractJsonValue(json, "temperature")
+//                        val humidity = extractJsonValue(json, "humidity")
+//                        val nh3 = extractJsonValue(json, "nh3")
+//                        val flame = extractJsonValue(json, "flame")
 
-                        Log.d(MAINTAG, "Got value, nh3: $nh3")
-                        Log.d(MAINTAG, "Got value, co2: $co2")
-                        Log.d(MAINTAG, "Got value, temp: $temp")
-                        Log.d(MAINTAG, "Got value, humidity: $humidity")
+                        robotData.co2 = extractJsonValue(json, "co2")?.toDouble()!!
+                        robotData.nh3 = extractJsonValue(json, "nh3")?.toDouble()!!
+                        robotData.flame = extractJsonValue(json, "flame") == "true"
+                        robotData.temperature = extractJsonValue(json, "temperature")?.toDouble()!!
+                        robotData.humidity = extractJsonValue(json, "humidity")?.toDouble()!!
+
+                        Log.d(MAINTAG, "Got value, nh3: ${robotData.nh3}")
+                        Log.d(MAINTAG, "Got value, co2: ${robotData.co2}")
+                        Log.d(MAINTAG, "Got value, temp: ${robotData.temperature}")
+                        Log.d(MAINTAG, "Got value, humidity: ${robotData.humidity}")
 
                         // Atualizar valores de sensores
-//                        tvCarbonDioxide.text = String.format(locale = Locale.getDefault() ,"%.2f", co2)
-//                        tvTemperature.text = String.format(locale = Locale.getDefault(),"%.2f", temp)
-//                        tvHumidity.text = String.format(locale = Locale.getDefault(), "%.2f", humidity)
-//                        tvAmmonia.text = String.format(locale = Locale.getDefault(), "%.2f", nh3)
+                        tvCarbonDioxide.text = String.format(locale = Locale.getDefault() ,"%.2f", robotData.co2)
+                        tvTemperature.text = String.format(locale = Locale.getDefault(),"%.2f", robotData.temperature)
+                        tvHumidity.text = String.format(locale = Locale.getDefault(), "%.2f", robotData.humidity)
+                        tvAmmonia.text = String.format(locale = Locale.getDefault(), "%.2f", robotData.nh3)
+                        tvFlame.text = if(robotData.flame) "Detectada" else "Não detectada"
 
-//                        tvCarbonDioxide.text =  substring(co2, 0, 5)
-//                        tvTemperature.text = substring(temp, 0, 3)
-//                        tvHumidity.text = substring(humidity, 0, 3)
-//                        tvAmmonia.text = substring(nh3, 0, 5)
-
-                        tvCarbonDioxide.text =  co2
-                        tvTemperature.text = temp
-                        tvHumidity.text = humidity
-                        tvAmmonia.text = nh3
+//                        tvCarbonDioxide.text =  co2
+//                        tvTemperature.text = temp
+//                        tvHumidity.text = humidity
+//                        tvAmmonia.text = nh3
 
                         delay(500)
-                        //Validar e atualizar estado da chama
-                        //tvFlame.text = if (flame.toBoolean()) "Detectada" else "Não detectada"
 
                         //Verificar níveis e disparar notificações
-//                        launch {
-//                            if (co2?.toInt()!! > 1000) {
-//                                //tvCarbonDioxide.setBackgroundColor(Color.RED)
-//                                showNotification(1, "Alerta de CO2!", "Nível de CO2 muito alto: $co2 ppm.")
-//                                delay(3000)
-//                            }
-//                            if (nh3?.toInt()!! > 80) {
-//                                //tvAmmonia.setBackgroundColor(Color.RED)
-//                                showNotification(2, "Alerta de Amônia!", "Nível de NH3 muito alto: $nh3 ppb.")
-//                                delay(3000)
-//                            }
-//                            if (flame.toBoolean()) {
-//                                //tvFlame.setBackgroundColor(Color.RED)
-//                                showNotification(3, "Alerta de Chama!", "Presença de chama detectada!")
-//                                delay(3000)
-//                            }
-//                        }
+                        launch {
+                            if (robotData.co2 > 1000) {
+                                tvCarbonDioxideLabel.setBackgroundColor(Color.RED)
+                                showNotification(1, "Alerta de CO2!", "Nível de CO2 muito alto: ${robotData.co2} ppm.")
+                                delay(3000)
+                                tvCarbonDioxideLabel.setBackgroundColor(Color.GREEN)
+                            }
+                            if (robotData.nh3 > 80) {
+                                tvAmmoniaLabel.setBackgroundColor(Color.RED)
+                                showNotification(2, "Alerta de Amônia!", "Nível de NH3 muito alto: ${robotData.nh3} ppb.")
+                                delay(3000)
+                                tvAmmoniaLabel.setBackgroundColor(Color.GREEN)
+                            }
+                            if (robotData.flame) {
+                                tvFlameLabel.setBackgroundColor(Color.RED)
+                                showNotification(3, "Alerta de Chama!", "Presença de chama detectada!")
+                                delay(3000)
+                                tvFlameLabel.setBackgroundColor(Color.GREEN)
+                            }
+                        }
                     }
                 }
             } catch (e: Exception) {
