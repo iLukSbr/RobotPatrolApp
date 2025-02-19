@@ -159,14 +159,14 @@
         android:id="@+id/tvFlameValue"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="230dp"
+        android:layout_marginStart="40dp"
         android:text="Não detectado"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         android:textColor="#FFFFFF"
         android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@+id/tvFlameLabel"
-        app:layout_constraintStart_toStartOf="@+id/tvFlameLabel"
+        app:layout_constraintStart_toEndOf="@+id/tvFlameLabel"
         app:layout_constraintTop_toTopOf="@+id/tvFlameLabel" />
 
     <View

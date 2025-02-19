@@ -3,6 +3,7 @@ package com.example.robotpatrolapp
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -29,6 +30,8 @@ class MappingActivity : AppCompatActivity() {
     private lateinit var mapView: MapView
     private var isReceiving = true
     private val jsonParser = Json { ignoreUnknownKeys = true }
+    private val MAINTAG = "Main2"
+    private var distTraveledCm = 0.0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -87,25 +90,54 @@ class MappingActivity : AppCompatActivity() {
             return
         }
 
-        CoroutineScope(Dispatchers.IO).launch {
+        withContext(Dispatchers.IO) {
             try {
                 //val inputStream: InputStream = socket.getInputStream()
-                val reader = BufferedReader(InputStreamReader(socket.getInputStream()))
-
+                var reader = BufferedReader(InputStreamReader(socket.getInputStream()))
+                Log.d(MAINTAG, "Started")
                 while (isReceiving) {
+                    reader = BufferedReader(InputStreamReader(socket.getInputStream()))
                     //val buffer = ByteArray(1024)
                     //val bytesRead = inputStream.read(buffer)
-                    val jsonString = reader.readLine() ?: break
-                    val robotData = jsonParser.decodeFromString<RobotData>(jsonString)
+                    val jsonString = StringBuilder()
+                    if(socket.isClosed || !socket.isConnected) Log.e(MAINTAG, "Socket error")
+
+                    var charPrevious = 'a'
+                    while (true) {
+                        val char = reader.read().toChar()
+                        if(charPrevious == '}'){
+                            if(char == '}'){
+                                jsonString.append(char)
+                                break
+                            }
+                        }
+                        charPrevious = char
+                        jsonString.append(char)
+                    }
+
+                    val json = jsonString.toString()
+                    Log.d(MAINTAG, "Read: $json")
+
+                    val robotData = RobotInfo()
 
                     withContext(Dispatchers.Main) {
-                        val distTraveledCm = (robotData.traveled.rear_left + robotData.traveled.rear_right + robotData.traveled.front_left + robotData.traveled.front_right) / 4
-                        val angle = robotData.gyroscope.z
-                        val obsDistance = robotData.distance.front
-                        val isNotSafe = robotData.co2 > 1000  || robotData.flame || robotData.nh3 > 80
-                        run(distTraveledCm.toFloat(), angle.toFloat(), obsDistance.toFloat(), isNotSafe)
+                        robotData.co2 = extractJsonValue(json, "co2")?.toDouble()!!
+                        robotData.nh3 = extractJsonValue(json, "nh3")?.toDouble()!!
+                        robotData.flame = extractJsonValue(json, "flame") == "true"
+                        robotData.distanceTraveledRearLeft = extractNestedJsonValue(json, "traveled", "rear_left")?.toDouble()!! - 0.01063428
+                        robotData.distanceTraveledRearRight = extractNestedJsonValue(json, "traveled", "rear_right")?.toDouble()!!
+                        robotData.distanceTraveledFrontLeft = extractNestedJsonValue(json, "traveled", "front_left")?.toDouble()!!
+                        robotData.gyroscopeZ = extractNestedJsonValue(json, "gyroscope", "z")?.toDouble()!!
+                        robotData.objectDist = extractNestedJsonValue(json, "distance", "front")?.toDouble()!!
+                        distTraveledCm = ((robotData.distanceTraveledRearLeft + robotData.distanceTraveledRearRight + robotData.distanceTraveledFrontLeft) / 3) - distTraveledCm
+                        Log.d(MAINTAG, "$robotData")
+                        val angle = 0f
+                        val isNotSafe = robotData.co2 > 1000  || robotData.nh3 > 80
+                        run(distTraveledCm.toFloat(), angle, -1f, isNotSafe)
+                        Log.d(MAINTAG, "ran success")
+
+                        delay(500)
                     }
-                    delay(1000)
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -167,10 +199,32 @@ class MappingActivity : AppCompatActivity() {
 //        }
 //    }
 
+    private fun extractJsonValue(jsonString: String, key: String): String? {
+        val regex = Regex(""""$key"\s*:\s*("(.*?)"|[\d.+-]+|true|false|null)""")
+        val match = regex.find(jsonString)
 
+        return match?.groups?.get(2)?.value ?: match?.groups?.get(1)?.value
+    }
+
+
+    private fun extractNestedJsonValue(jsonString: String, parentKey: String, nestedKey: String): String? {
+        val regex = Regex(""""$parentKey"\s*:\s*\{(.*?)\}""")
+        val parentMatch = regex.find(jsonString)
+
+        parentMatch?.let {
+            val nestedJson = it.groups[1]?.value ?: return null
+            val nestedRegex = Regex(""""$nestedKey"\s*:\s*("(.*?)"|[\d.+-]+|true|false|null)""")
+            val nestedMatch = nestedRegex.find(nestedJson)
+            return nestedMatch?.groups?.get(2)?.value ?: nestedMatch?.groups?.get(1)?.value
+        }
+
+        return null
+    }
 
     private fun resetMapping() {
         mapView.resetCanvas()
     }
 }
+
+
 

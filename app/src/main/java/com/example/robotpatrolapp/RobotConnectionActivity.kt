@@ -13,6 +13,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import kotlinx.coroutines.*
 import android.widget.Toast
+import com.example.robotpatrolapp.model.RobotPosition
 import java.net.Socket
 
 class RobotConnectionActivity : AppCompatActivity() {
@@ -47,7 +48,7 @@ class RobotConnectionActivity : AppCompatActivity() {
                         tvStatus.setTextColor(Color.GREEN)
 
                         // Navigate to MainActivity
-                        val intent = Intent(this@RobotConnectionActivity, MainActivity::class.java)
+                        val intent = Intent(this@RobotConnectionActivity, MappingActivity::class.java)
                         startActivity(intent)
                         finish()
                     }

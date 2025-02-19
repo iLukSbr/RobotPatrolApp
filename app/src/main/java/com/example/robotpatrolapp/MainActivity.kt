@@ -1,5 +1,6 @@
 package com.example.robotpatrolapp
 
+import android.util.Log
 import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -8,6 +9,7 @@ import android.content.Intent
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
+import android.text.TextUtils.substring
 import android.widget.Button
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
@@ -20,6 +22,7 @@ import androidx.core.view.WindowInsetsCompat
 import kotlinx.coroutines.*
 import java.io.InputStream
 import androidx.core.app.ActivityCompat
+import com.google.gson.Gson
 import kotlinx.serialization.json.Json
 import java.io.BufferedReader
 import java.io.InputStreamReader
@@ -36,8 +39,13 @@ class MainActivity : AppCompatActivity() {
     private var isReceiving = true // Control flag to stop receiving when needed
     private val channelId = "sensor_alert_channel" // Notification channel
     private val jsonParser = Json { ignoreUnknownKeys = true }
+    private val gson = Gson()
+
+    private val MAINTAG = "Main"
+    private val VALUESTAG = "Values"
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Log.d(MAINTAG, "Creating" )
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
@@ -64,6 +72,7 @@ class MainActivity : AppCompatActivity() {
         tvAmmonia = findViewById(R.id.tvAmmoniaValue)
         tvFlame = findViewById(R.id.tvFlameValue)
 
+
         createNotificationChannel()
 
         CoroutineScope(Dispatchers.IO).launch {
@@ -83,79 +92,6 @@ class MainActivity : AppCompatActivity() {
     
     private var lastFlameState: Boolean = false // Armazena o último estado de chama
 
-//    private suspend fun receiveData() {
-//        val socket = SocketManager.socket
-//        if (socket == null) {
-//            withContext(Dispatchers.Main) {
-//                resetSensorValues()
-//            }
-//            return
-//        }
-//
-//        CoroutineScope(Dispatchers.IO).launch {
-//            try {
-//                val inputStream: InputStream = socket.getInputStream()
-//
-//                while (isReceiving) {
-//                    val buffer = ByteArray(1024)
-//                    val bytesRead = inputStream.read(buffer)
-//
-//                    if (bytesRead > 0) {
-//                        val receivedMessage = String(buffer, 0, bytesRead).trim()
-//                        val parts = receivedMessage.split(",")
-//
-//                        if (parts.size < 5) {
-//                            continue // Ignorar mensagens incompletas
-//                        }
-//
-//                        withContext(Dispatchers.Main) {
-//                            val co2 = parts.getOrNull(0)?.toFloatOrNull() ?: 0f
-//                            val temp = parts.getOrNull(1)?.toFloatOrNull() ?: 0f
-//                            val humidity = parts.getOrNull(2)?.toFloatOrNull() ?: 0f
-//                            val nh3 = parts.getOrNull(3)?.toFloatOrNull() ?: 0f
-//                            val flame = parts.getOrNull(4)?.toIntOrNull() ?: -1
-//
-//                            // Atualizar valores de sensores
-//                            tvCarbonDioxide.text = String.format("%.2f", co2)
-//                            tvTemperature.text = String.format("%.2f", temp)
-//                            tvHumidity.text = String.format("%.2f", humidity)
-//                            tvAmmonia.text = String.format("%.2f", nh3)
-//
-//                            // Validar e atualizar estado da chama
-//                            if (flame in 0..1) {
-//                                if (lastFlameState != flame) {
-//                                    lastFlameState = flame
-//                                    tvFlame.text = if (flame == 1) "Detectada" else "Não detectada"
-//                                }
-//                            }
-//
-//                            // Verificar níveis e disparar notificações
-//                            launch {
-//                                if (co2 > 1000) {
-//                                    showNotification(1, "Alerta de CO2!", "Nível de CO2 muito alto: $co2 ppm.")
-//                                    delay(3000)
-//                                }
-//                                if (nh3 > 80) {
-//                                    showNotification(2, "Alerta de Amônia!", "Nível de NH3 muito alto: $nh3 ppb.")
-//                                    delay(3000)
-//                                }
-//                                if (flame == 1) {
-//                                    showNotification(3, "Alerta de Chama!", "Presença de chama detectada!")
-//                                    delay(3000)
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//            } catch (e: Exception) {
-//                e.printStackTrace()
-//                withContext(Dispatchers.Main) {
-//                    resetSensorValues()
-//                }
-//            }
-//        }
-//    }
-
     private suspend fun receiveData() {
         val socket = SocketManager.socket
         if (socket == null) {
@@ -164,55 +100,129 @@ class MainActivity : AppCompatActivity() {
             }
             return
         }
+        Log.d(MAINTAG, "Receiving data" )
 
-        CoroutineScope(Dispatchers.IO).launch {
+        withContext(Dispatchers.IO) {
             try {
-                val reader = BufferedReader(InputStreamReader(socket.getInputStream()))
+                var reader = BufferedReader(InputStreamReader(socket.getInputStream()))
+                //val reader = BufferedReader(InputStreamReader(socket.getInputStream()))
+//                Log.d(MAINTAG, "Receiving and reading JSON: $reader" )
+
+                // Debug: Check if data is available
+//                if (socket.getInputStream().available() == 0) {
+//                    Log.e(MAINTAG, "No data available yet")
+//                } else {
+//                    Log.d(MAINTAG, "Data detected!")
+//                }
+                //val jsonString = StringBuilder()
 
                 while (isReceiving) {
-                    val jsonString = reader.readLine() ?: break
-                    val robotData = jsonParser.decodeFromString<RobotData>(jsonString)
+                    Log.d(MAINTAG, "Started Loop")
+                    reader = BufferedReader(InputStreamReader(socket.getInputStream()))
+                    Log.d(MAINTAG, "Receiving and reading JSON: $reader" )
 
-                    withContext(Dispatchers.Main) {
-                        val co2 = robotData.co2
-                        val temp = robotData.temperature
-                        val humidity = robotData.humidity
-                        val nh3 = robotData.nh3
-                        val flame = robotData.flame
+                    if (socket.getInputStream().available() == 0) {
+                        Log.e(MAINTAG, "No data available yet")
+                    } else {
+                        Log.d(MAINTAG, "Data detected!")
+                    }
 
-                        // Atualizar valores de sensores
-                        tvCarbonDioxide.text = String.format(Locale.getDefault(), "%.2f", co2)
-                        tvTemperature.text = String.format(Locale.getDefault(), "%.2f", temp)
-                        tvHumidity.text = String.format(Locale.getDefault(),"%.2f", humidity)
-                        tvAmmonia.text = String.format(Locale.getDefault(),"%.2f", nh3)
+                    val jsonString = StringBuilder()
 
-                        // Validar e atualizar estado da chama
-                        tvFlame.text = if (flame) "Detectada" else "Não detectada"
-//                        if (flame in 0..1) {
-//                            if (lastFlameState != flame) {
-//                                lastFlameState = flame
-//                                tvFlame.text = if (flame) "Detectada" else "Não detectada"
-//                            }
-//                        }
+                    //val reader = BufferedReader(InputStreamReader(socket.getInputStream()))
+                    if(socket.isClosed || !socket.isConnected) Log.e(MAINTAG, "Socket error")
 
-                        // Verificar níveis e disparar notificações
-                        launch {
-                            if (co2 > 1000) {
-                                //tvCarbonDioxide.setBackgroundColor(Color.RED)
-                                showNotification(1, "Alerta de CO2!", "Nível de CO2 muito alto: $co2 ppm.")
-                                delay(3000)
-                            }
-                            if (nh3 > 80) {
-                                //tvAmmonia.setBackgroundColor(Color.RED)
-                                showNotification(2, "Alerta de Amônia!", "Nível de NH3 muito alto: $nh3 ppb.")
-                                delay(3000)
-                            }
-                            if (flame) {
-                                //tvFlame.setBackgroundColor(Color.RED)
-                                showNotification(3, "Alerta de Chama!", "Presença de chama detectada!")
-                                delay(3000)
+                    var charPrevious = 'a'
+                    while (true) {
+                        val char = reader.read().toChar()
+                        if(charPrevious == '}'){
+                            if(char == '}'){
+                                jsonString.append(char)
+                                break
                             }
                         }
+                        charPrevious = char
+                        Log.e(VALUESTAG, "$char")
+                        //if (char == '$') break // End of stream
+                        jsonString.append(char)
+                        //if (char == '}') break // Assuming JSON ends with `}`
+                    }
+                    Log.d(MAINTAG, "Saiu: ")
+                    //val line = reader.readLine() ?: break
+                    //if (line.isEmpty()) Log.e(TAG, "Line empty")
+                    //jsonString.append(line)
+                    val json = jsonString.toString()
+                    Log.d(MAINTAG, "Received data: $json")
+
+
+
+
+//                    if (reader.ready()) {
+//                        val jsonString = reader.readLine() ?: break
+//                        Log.d("SocketDebug", "Received data: $jsonString")
+//                    } else {
+//                        tvHumidity.text = "999"
+//                        Log.d("SocketDebug", "No data available")
+//                        delay(100) // Wait for data
+//                    }
+                    //val robotData = jsonParser.decodeFromString<RobotData>(json)
+                    Log.d(MAINTAG, "Passed data")
+
+                    withContext(Dispatchers.Main) {
+//                        val co2 = robotData.co2
+//                        val temp = robotData.temperature
+//                        val humidity = robotData.humidity
+//                        val nh3 = robotData.nh3
+//                        val flame = robotData.flame
+                        val co2 = extractJsonValue(json, "co2")
+                        val temp = extractJsonValue(json, "temperature")
+                        val humidity = extractJsonValue(json, "humidity")
+                        val nh3 = extractJsonValue(json, "nh3")
+                        val flame = extractJsonValue(json, "flame")
+
+                        Log.d(MAINTAG, "Got value, nh3: $nh3")
+                        Log.d(MAINTAG, "Got value, co2: $co2")
+                        Log.d(MAINTAG, "Got value, temp: $temp")
+                        Log.d(MAINTAG, "Got value, humidity: $humidity")
+
+                        // Atualizar valores de sensores
+//                        tvCarbonDioxide.text = String.format(locale = Locale.getDefault() ,"%.2f", co2)
+//                        tvTemperature.text = String.format(locale = Locale.getDefault(),"%.2f", temp)
+//                        tvHumidity.text = String.format(locale = Locale.getDefault(), "%.2f", humidity)
+//                        tvAmmonia.text = String.format(locale = Locale.getDefault(), "%.2f", nh3)
+
+//                        tvCarbonDioxide.text =  substring(co2, 0, 5)
+//                        tvTemperature.text = substring(temp, 0, 3)
+//                        tvHumidity.text = substring(humidity, 0, 3)
+//                        tvAmmonia.text = substring(nh3, 0, 5)
+
+                        tvCarbonDioxide.text =  co2
+                        tvTemperature.text = temp
+                        tvHumidity.text = humidity
+                        tvAmmonia.text = nh3
+
+                        delay(500)
+                        //Validar e atualizar estado da chama
+                        //tvFlame.text = if (flame.toBoolean()) "Detectada" else "Não detectada"
+
+                        //Verificar níveis e disparar notificações
+//                        launch {
+//                            if (co2?.toInt()!! > 1000) {
+//                                //tvCarbonDioxide.setBackgroundColor(Color.RED)
+//                                showNotification(1, "Alerta de CO2!", "Nível de CO2 muito alto: $co2 ppm.")
+//                                delay(3000)
+//                            }
+//                            if (nh3?.toInt()!! > 80) {
+//                                //tvAmmonia.setBackgroundColor(Color.RED)
+//                                showNotification(2, "Alerta de Amônia!", "Nível de NH3 muito alto: $nh3 ppb.")
+//                                delay(3000)
+//                            }
+//                            if (flame.toBoolean()) {
+//                                //tvFlame.setBackgroundColor(Color.RED)
+//                                showNotification(3, "Alerta de Chama!", "Presença de chama detectada!")
+//                                delay(3000)
+//                            }
+//                        }
                     }
                 }
             } catch (e: Exception) {
@@ -244,6 +254,13 @@ class MainActivity : AppCompatActivity() {
             val manager = getSystemService(NotificationManager::class.java)
             manager?.createNotificationChannel(channel)
         }
+    }
+
+    private fun extractJsonValue(jsonString: String, key: String): String? {
+        val regex = Regex(""""$key"\s*:\s*("(.*?)"|[\d.+-]+|true|false|null)""")
+        val match = regex.find(jsonString)
+
+        return match?.groups?.get(2)?.value ?: match?.groups?.get(1)?.value
     }
 
     private fun showNotification(notificationId: Int, title: String, message: String) {
