@@ -19,17 +19,17 @@ data class RobotData(
     val pressure: Double,
     val co2: Int,
     val nh3: Double,
-    val battery_percentage: Int,
+    val battery_percentage: Double,
     val raw_nh3: Int,
     val flame: Boolean,
     val nh3_alarm: Boolean,
     val traveled: WheelSpeeds,
-    val current: Int,
+    val current: Double,
     val accelerometer: Vector3D
 )
 
 @Serializable
-data class Distance(val front: Int, val right: Int, val left: Int, val rear: Int)
+data class Distance(val front: Double, val right: Double, val left: Double, val rear: Double)
 
 @Serializable
 data class Vector3D(val x: Double, val y: Double, val z: Double)

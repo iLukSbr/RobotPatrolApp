@@ -61,7 +61,7 @@ class MappingActivity : AppCompatActivity() {
         }
     }
 
-    private fun run(distTraveledCm: Float, angle: Float, obsDistance: Float, isNotSafe: Boolean) {
+    private fun run(distTraveledCm: Double, angle: Double, obsDistance: Double, isNotSafe: Boolean) {
         if(obsDistance < 50f && obsDistance > 0f)
             mapView.addObstacle(mapView.getPositionX() + obsDistance * cos(mapView.getPositionTheta()), mapView.getPositionY() + obsDistance * sin(mapView.getPositionTheta()))
 
@@ -132,7 +132,7 @@ class MappingActivity : AppCompatActivity() {
                         Log.d(MAINTAG, "$robotData")
                         val angle = robotData.gyroscopeZ
                         val isNotSafe = robotData.co2 > 1000  || robotData.nh3 > 80
-                        run(distTraveledCm.toFloat(), angle.toFloat(), robotData.objectDist.toFloat(), isNotSafe)
+                        run(distTraveledCm.toDouble(), angle.toDouble(), robotData.objectDist.toDouble(), isNotSafe)
                         Log.d(MAINTAG, "ran success")
 
                         delay(1000)
@@ -166,7 +166,7 @@ class MappingActivity : AppCompatActivity() {
 //                        val angle = robotData.gyroscope.z
 //                        val obsDistance = robotData.distance.front
 //                        val isNotSafe = robotData.co2 > 1000  || robotData.flame || robotData.nh3 > 80
-//                        run(distTraveledCm.toFloat(), angle.toFloat(), obsDistance.toFloat(), isNotSafe)
+//                        run(distTraveledCm.toDouble(), angle.toDouble(), obsDistance.toDouble(), isNotSafe)
 //                    }
 //                    delay(100)
 //                }
@@ -185,7 +185,7 @@ class MappingActivity : AppCompatActivity() {
 //                        val angle = robotData.gyroscope.z
 //                        val obsDistance = robotData.distance.front
 //                        val isNotSafe = robotData.co2 > 1000  || robotData.flame || robotData.nh3 > 80
-//                        run(distTraveledCm.toFloat(), angle.toFloat(), obsDistance.toFloat(), isNotSafe)
+//                        run(distTraveledCm.toDouble(), angle.toDouble(), obsDistance.toDouble(), isNotSafe)
 //                    }
 //                    delay(1000)
 //                }

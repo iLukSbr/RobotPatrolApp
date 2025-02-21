@@ -15,7 +15,7 @@ class MapView @JvmOverloads constructor(context: Context, attrs: AttributeSet? =
     private val robotPath = Path()
     private var scaleFactor = 1f  // Initial zoom level
     private val zoomOutFactor = 0.9f  // How much to zoom out each time
-    private val obstacles = mutableListOf<Pair<Float, Float>>() //List of obstacles coordinates
+    private val obstacles = mutableListOf<Pair<Double, Double>>() //List of obstacles coordinates
     //private val robotPathMeasure = PathMeasure(robotPath, false)
 
     private val robotPaint: Paint = Paint().apply {
@@ -46,7 +46,7 @@ class MapView @JvmOverloads constructor(context: Context, attrs: AttributeSet? =
     }
 
     // Method to set a new starting position
-    fun setStartingPosition(x: Float, y: Float, theta : Float) {
+    fun setStartingPosition(x: Double, y: Double, theta : Double) {
         robotPosition.x = x
         robotPosition.y = y
         robotPosition.theta = theta
@@ -95,7 +95,7 @@ class MapView @JvmOverloads constructor(context: Context, attrs: AttributeSet? =
         }
     }
 
-    private fun drawArrow(canvas: Canvas, x: Float, y: Float, angle: Float) {
+    private fun drawArrow(canvas: Canvas, x: Double, y: Double, angle: Double) {
         val arrowSize = 40f  // Length of the arrow
         val arrowPath = Path()
 
@@ -127,19 +127,19 @@ class MapView @JvmOverloads constructor(context: Context, attrs: AttributeSet? =
     }
 
     // Call this to get robot position
-    fun getPositionX():  Float{
+    fun getPositionX():  Double{
         return robotPosition.x
     }
 
-    fun getPositionY():  Float{
+    fun getPositionY():  Double{
         return robotPosition.y
     }
 
-    fun getPositionTheta():  Float{
+    fun getPositionTheta():  Double{
         return robotPosition.theta
     }
 
-    fun addObstacle(x: Float, y: Float) {
+    fun addObstacle(x: Double, y: Double) {
         obstacles.add(Pair(x, y))
         invalidate()  // Refresh view
     }
